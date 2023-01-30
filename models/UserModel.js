@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
 /**
  * @class User
@@ -132,4 +132,4 @@ class User{
     }
 }
 
-module.exports = User;
+export default User;

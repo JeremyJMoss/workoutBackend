@@ -1,4 +1,3 @@
-
 /**
  * @class Database
  * @classdesc This is the interface for database connections. Only to be inherited from.
@@ -21,4 +20,4 @@ class Database{
     }
 };
 
-module.exports = Database;
+export default Database;

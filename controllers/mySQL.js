@@ -1,4 +1,4 @@
-const {checkLoginCredentials} = require("../services/mysql");
+import {checkLoginCredentials} from "../services/mysql";
 
 exports.authenticateUser = (req, res, next) => {
     const {username, password} = req.body;

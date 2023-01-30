@@ -1,8 +1,9 @@
-const express = require("express");
-const mySQLController = require("../controllers/mySQL");
+import express from "express";
+import mySQLController from "../controllers/mySQL";
+
 const router = express.Router();
 
 router.post("/authenticateLogin", mySQLController.authenticateUser);
 
 
-module.exports = router;
+export default router;

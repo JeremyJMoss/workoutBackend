@@ -1,9 +1,10 @@
-const {mySQLConfig} = require("../config/mysqlconfig");
-const MySQLDatabase = require("../models/MySQLDatabase");
-const mysqlDb = new MySQLDatabase(mySQLConfig);
-const bcrypt = require("bcrypt");
+import {mySQLConfig} from "../config/mysqlconfig";
+import MySQLDatabase from "../models/MySQLDatabase";
+import bcrypt from "bcrypt";
 
-exports.checkLoginCredentials = async (username, password) => {
+const mysqlDb = new MySQLDatabase(mySQLConfig);
+
+export const checkLoginCredentials = async (username, password) => {
     mysqlDb.connect();
     const sqlQuery = "SELECT password FROM users WHERE username=? limit 1;"
     try{

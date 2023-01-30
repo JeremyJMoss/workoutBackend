@@ -1,5 +1,5 @@
-const mysql = require("mysql2");
-const Database = require("./Database");
+import mysql from "mysql2";
+import Database from "./Database";
 
 /**
  * 
@@ -69,4 +69,4 @@ class MySQLDatabase extends Database{
     }
 }
 
-module.exports = MySQLDatabase;
+export default MySQLDatabase;
