@@ -1,6 +1,6 @@
-import {checkLoginCredentials} from "../services/mysql";
+import {checkLoginCredentials} from "../services/mysql.js";
 
-exports.authenticateUser = (req, res, next) => {
+export const authenticateUser = (req, res, next) => {
     const {username, password} = req.body;
     if (!username){
         return res.status(400).json({error: "Username must not be empty"});

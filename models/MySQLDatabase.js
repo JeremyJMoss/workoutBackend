@@ -1,5 +1,5 @@
 import mysql from "mysql2";
-import Database from "./Database";
+import Database from "./Database.js";
 
 /**
  * 
