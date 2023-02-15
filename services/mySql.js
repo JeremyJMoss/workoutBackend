@@ -1,8 +1,8 @@
-import {mySQLConfig} from "../config/config.js";
+import {mySqlConfig} from "../config/config.js";
 import MySQLDatabase from "../models/MySQLDatabase.js";
 import bcrypt from "bcrypt";
 
-const mysqlDb = new MySQLDatabase(mySQLConfig);
+const mysqlDb = new MySQLDatabase(mySqlConfig);
 
 export const checkLoginCredentials = async (username, password) => {
     mysqlDb.connect();

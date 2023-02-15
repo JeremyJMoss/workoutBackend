@@ -1,4 +1,4 @@
-import {checkLoginCredentials} from "../services/mysql.js";
+import {checkLoginCredentials} from "../services/mySql.js";
 
 export const authenticateUser = (req, res, next) => {
     const {username, password} = req.body;

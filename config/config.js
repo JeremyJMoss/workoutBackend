@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-export const mySQLConfig = {
-    host: process.env.MYSQLHOST,
-    user: process.env.MYSQLUSER,
-    password: process.env.MYSQLPASSWORD,
-    database: process.env.MYSQLDB
+export const mySqlConfig = {
+    host: process.env.MY_SQL_HOST,
+    user: process.env.MY_SQL_USER,
+    password: process.env.MY_SQL_PASSWORD,
+    database: process.env.MY_SQL_DATABASE
 };
 
