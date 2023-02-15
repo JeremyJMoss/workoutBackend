@@ -11,9 +11,11 @@ export const authenticateUser = (req, res, next) => {
     checkLoginCredentials(username, password)
     .then((isMatch) => {
         if (isMatch){
-            return res.status(200).json({loggedin: true});
+            console.log("valid");
+            return res.status(200).json({loggedIn: true});
         }
-        return res.status(200).json({loggedin: false, error: "Username or password is invalid"});
+        console.log("invalid");
+        return res.status(200).json({loggedIn: false, error: "Username or password is invalid"});
     })
-    .catch((err) => res.status(502).json({loggedin: false, error: `${err.message}`}));
+    .catch((err) => res.status(502).json({loggedIn: false, error: `${err.message}`}));
 };
