@@ -17,3 +17,9 @@ export const authenticateUser = (req, res, next) => {
     })
     .catch((err) => res.status(502).json({loggedIn: false, error: `${err.message}`}));
 };
+
+export const authenticateSignup = (req, res, next) => {
+    const signupData = req.body;
+    console.log(signupData);
+    res.status(200).json("here");
+}

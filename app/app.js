@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 import loginRoutes from "../routes/login.js";
+import signupRoutes from "../routes/signup.js";
 import helloWorldRoutes from "../routes/helloWorld.js";
 
 const app = express();
@@ -12,5 +13,6 @@ app.use(cors());
 
 app.use(helloWorldRoutes);
 app.use(loginRoutes);
+app.use(signupRoutes);
 
 export default app;
