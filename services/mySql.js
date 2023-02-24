@@ -1,6 +1,6 @@
 import {mySqlConfig} from "../config/config.js";
 import MySQLDatabase from "../models/MySQLDatabase.js";
-import bcrypt from "bcrypt";
+import { comparePasswords } from "./cryptography.js";
 
 const mysqlDb = new MySQLDatabase(mySqlConfig);
 
@@ -13,14 +13,35 @@ export const checkLoginCredentials = async (username, password) => {
             return false;
         }
         const hashedPassword = results[0].password;
-        const isMatch = await bcrypt.compare(password, hashedPassword);
+        const isMatch = comparePasswords(password, hashedPassword);
         return isMatch;
     }
     catch(err){
-        throw err;
+        throw new Error(err.message);
     }
     finally{
         mysqlDb.close();
     }
 };
+
+export const createUser = async (user) => {
+    mysqlDb.connect()
+    const sqlQuery = "INSERT INTO users (username, firstname, lastname, email, password) VALUES(?, ?, ?, ?, ?);"
+    try{
+        await mysqlDb.query(sqlQuery, 
+            [
+                user.username,
+                user.firstName,
+                user.lastName,
+                user.email,
+                user.encryptedPassword
+            ]);
+    }
+    catch(err){
+        throw new Error(err.message);
+    }
+    finally{
+        mysqlDb.close();
+    }
+}
 

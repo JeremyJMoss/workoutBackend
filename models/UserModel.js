@@ -1,5 +1,3 @@
-import bcrypt from "bcrypt";
-
 /**
  * @class User
  * @classdesc This class is used for creating a user object.
@@ -12,35 +10,17 @@ import bcrypt from "bcrypt";
  */
 class User{
     #username
-    #decryptedPassword;
+    #encryptedPassword;
     #email;
     #firstName;
     #lastName;
 
-    constructor(username, firstName, lastName, email, decryptedPassword){
+    constructor(username, firstName, lastName, email, encryptedPassword){
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.#decryptedPassword = decryptedPassword;
-    }
-
-    /**
-     * Encrypts a users password
-     * 
-     * @memberof User
-     *
-     * @returns {Promise<Object>} - A promise that resolves with the hashed password or rejects with an error.
-     */
-    async encryptPassword(){
-        try{
-            const salt = await bcrypt.genSalt(12);
-            const hash = await bcrypt.hash(this.#decryptedPassword, salt);
-            return hash;
-        }
-        catch(err){
-          throw err;  
-        } 
+        this.encryptedPassword = encryptedPassword;
     }
 
     /**
@@ -60,7 +40,7 @@ class User{
      */
     set firstName(firstName){
         if(!firstName){
-            throw new Error("First Name mustn't be empty");
+            throw new Error("First Name must not be empty");
         }
         this.#firstName = firstName;
     }
@@ -82,7 +62,7 @@ class User{
      */
     set lastName(lastName){
         if(!lastName){
-            throw new Error("Last name mustn't be empty")
+            throw new Error("Last name must not be empty")
         }
         this.#lastName = lastName;
     }
@@ -104,7 +84,7 @@ class User{
      */
     set email(email){
         if(!email){
-            throw new Error("Email mustn't be empty");
+            throw new Error("Email must not be empty");
         }
         this.#email = email;
     }
@@ -126,9 +106,31 @@ class User{
      */
     set username(username){
         if(!username){
-            throw new Error("Username mustn't be empty");
+            throw new Error("Username must not be empty");
         }
         this.#username = username
+    }
+
+    /**
+     * Getter to retrieve the #encryptedPassword field value.
+     * 
+     * @returns {string} - The encrypted password of the user.
+     */
+    get encryptedPassword(){
+        return this.#encryptedPassword;
+    }
+    
+    /**
+     * Setter to make sure encrypted password field is not empty.
+     * 
+     * @param {string} encryptedPassword - The encrypted password of the user.
+     * 
+     */
+    set encryptedPassword(encryptedPassword){
+        if(!encryptedPassword){
+            throw new Error("password must not be empty");
+        }
+        this.#encryptedPassword = encryptedPassword;
     }
 }
 

@@ -5,6 +5,6 @@ import {authenticateUser} from "../controllers/mySql.js";
 
 const router = express.Router();
 
-router.post("/authenticateLogin", authenticateUser);
+router.post("/login", authenticateUser);
 
 export default router;
