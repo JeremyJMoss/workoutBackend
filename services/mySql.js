@@ -6,7 +6,7 @@ const mysqlDb = new MySQLDatabase(mySqlConfig);
 
 export const checkLoginCredentials = async (username, password) => {
     mysqlDb.connect();
-    const sqlQuery = "SELECT password FROM users WHERE username=? limit 1;"
+    const sqlQuery = "SELECT password FROM users WHERE username=? LIMIT 1;"
     try{
         const results = await mysqlDb.query(sqlQuery, [username]);
         if (results.length < 1){
@@ -23,6 +23,36 @@ export const checkLoginCredentials = async (username, password) => {
         mysqlDb.close();
     }
 };
+
+export const retrieveUserDetails = async (username) => {
+    mysqlDb.connect();
+    const sqlQuery = "SELECT id, username, firstname, lastname, email FROM users WHERE username=? LIMIT 1;";
+    try{
+        const user = await mysqlDb.query(sqlQuery, [username]);
+        return user;
+    }
+    catch(error){
+        throw new Error(error.message);
+    }
+    finally{
+        mysqlDb.close();
+    }
+}
+
+export const verifyUser = async (userId, username, email) => {
+    mysqlDb.connect();
+    const sqlQuery = "SELECT * FROM users WHERE id = ? AND username = ? AND email = ? LIMIT 1;";
+    try{
+        const user = await mysqlDb.query(sqlQuery, [userId, username, email]);
+        return user;
+    }
+    catch(error){
+        throw new Error(error.message);
+    }
+    finally{
+        mysqlDb.close();
+    }
+}
 
 export const createUser = async (user) => {
     mysqlDb.connect()
@@ -45,3 +75,18 @@ export const createUser = async (user) => {
     }
 }
 
+
+export const retrieveMealTypes = async () => {
+    mysqlDb.connect();
+    const sqlQuery = "SELECT * FROM mealTypes;";
+    try {
+        const results = await mysqlDb.query(sqlQuery);
+        return results;
+    }
+    catch(err){
+        throw new Error(err.message);
+    }
+    finally{
+        mysqlDb.close();
+    }
+}

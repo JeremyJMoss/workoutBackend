@@ -8,3 +8,5 @@ export const mySqlConfig = {
     database: process.env.MY_SQL_DATABASE
 };
 
+export const JWT_SECRET_KEY = process.env.SECRET_KEY
+

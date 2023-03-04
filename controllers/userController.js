@@ -15,6 +15,9 @@ export const authenticateUser = (req, res, next) => {
     .then((isMatch) => {
         if (isMatch){
             retrieveUserDetails(username).then((user) => {
+                const nextMonth = new Date();
+                nextMonth.setDate(nextMonth.getDate() + 30);
+                user[0].exp = +nextMonth;
                 const token = jwt.sign(user[0], JWT_SECRET_KEY);
                 return res.status(200).send({token});
             })
@@ -55,9 +58,11 @@ export const authenticateToken = (req, res, next) => {
 
     const decodedToken = jwt.verify(token, JWT_SECRET_KEY);
 
+    const expiry = new Date(decodedToken.exp)
+    const today = new Date();
 
-    if (!decodedToken){
-        return res.status(401).send({message: "Unauthorized: Invalid Token"});
+    if (!decodedToken || today >= expiry){
+        return res.status(401).send({message: "Unauthorized: Invalid or Expired Token"});
     }
 
     verifyUser(decodedToken.id, decodedToken.username, decodedToken.email).then((user) => {
