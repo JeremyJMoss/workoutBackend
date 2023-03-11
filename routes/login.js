@@ -1,11 +1,11 @@
 // fired on login routes
 
 import express from "express";
-import {authenticateUser, authenticateToken} from "../controllers/userController.js";
+import {loginUser, checkUserLoggedIn} from "../controllers/userController.js";
 
 const router = express.Router();
 
-router.post("/login", authenticateUser);
-router.post("/login/token", authenticateToken);
+router.post("/login", loginUser);
+router.post("/login/token", checkUserLoggedIn);
 
 export default router;

@@ -9,9 +9,11 @@ export const checkLoginCredentials = async (username, password) => {
     const sqlQuery = "SELECT password FROM users WHERE username=? LIMIT 1;"
     try{
         const results = await mysqlDb.query(sqlQuery, [username]);
+        
         if (results.length < 1){
             return false;
         }
+        
         const hashedPassword = results[0].password;
         const isMatch = comparePasswords(password, hashedPassword);
         return isMatch;
@@ -26,7 +28,7 @@ export const checkLoginCredentials = async (username, password) => {
 
 export const retrieveUserDetails = async (username) => {
     mysqlDb.connect();
-    const sqlQuery = "SELECT id, username, firstname, lastname, email FROM users WHERE username=? LIMIT 1;";
+    const sqlQuery = "SELECT id, username, firstname, lastname, email, isAdmin FROM users WHERE username=? LIMIT 1;";
     try{
         const user = await mysqlDb.query(sqlQuery, [username]);
         return user;
@@ -56,16 +58,21 @@ export const verifyUser = async (userId, username, email) => {
 
 export const createUser = async (user) => {
     mysqlDb.connect()
-    const sqlQuery = "INSERT INTO users (username, firstname, lastname, email, password) VALUES(?, ?, ?, ?, ?);"
+    const sqlQuery = "INSERT INTO users (username, firstname, lastname, email, password, isAdmin) VALUES(?, ?, ?, ?, ?, ?);"
     try{
-        await mysqlDb.query(sqlQuery, 
+        const result = await mysqlDb.query(sqlQuery, 
             [
                 user.username,
                 user.firstName,
                 user.lastName,
                 user.email,
-                user.encryptedPassword
+                user.encryptedPassword,
+                user.isAdmin
             ]);
+        if (result.affectedRows < 1){
+            throw new Error("User failed to be added");
+        }
+        return user;
     }
     catch(err){
         throw new Error(err.message);
