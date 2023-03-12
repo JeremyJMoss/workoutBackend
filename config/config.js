@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+export const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
+
 export const mySqlConfig = {
     host: process.env.MY_SQL_HOST,
     user: process.env.MY_SQL_USER,

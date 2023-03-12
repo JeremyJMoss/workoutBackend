@@ -1,8 +1,12 @@
 import {mySqlConfig} from "../config/config.js";
+import HttpError from "../models/HttpError.js";
 import MySQLDatabase from "../models/MySQLDatabase.js";
 import { comparePasswords } from "./cryptography.js";
 
 const mysqlDb = new MySQLDatabase(mySqlConfig);
+
+
+// User calls
 
 export const checkLoginCredentials = async (username, password) => {
     mysqlDb.connect();
@@ -58,7 +62,7 @@ export const verifyUser = async (userId, username, email) => {
 
 export const createUser = async (user) => {
     mysqlDb.connect()
-    const sqlQuery = "INSERT INTO users (username, firstname, lastname, email, password, isAdmin) VALUES(?, ?, ?, ?, ?, ?);"
+    const sqlQuery = "INSERT INTO users (username, firstname, lastname, email, password, isAdmin) VALUES(?, ?, ?, ?, ?, ?);";
     try{
         const result = await mysqlDb.query(sqlQuery, 
             [
@@ -82,6 +86,7 @@ export const createUser = async (user) => {
     }
 }
 
+// Meal Calls
 
 export const retrieveMealTypes = async () => {
     mysqlDb.connect();
@@ -95,5 +100,62 @@ export const retrieveMealTypes = async () => {
     }
     finally{
         mysqlDb.close();
+    }
+}
+
+const createNewFood = async(foodName) => {
+    const sqlQuery = "INSERT INTO food (name) VALUES (?);";
+    try{
+        const results = await mysqlDb.query(sqlQuery, foodName);
+        return results;
+    }
+    catch(error){
+        throw new HttpError("Could not insert into food table", 500)
+    }
+}
+
+const createNewServing = async (foodId, newMeal) => {
+    const sqlQuery = "INSERT INTO servings (energy, protein, totalFat, saturatedFat, carbohydrates, sugars, sodium, servingSize, unitOfMeasurement, foodId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+    console.log(newMeal);
+    try{
+        const results = await mysqlDb.query(
+            sqlQuery, 
+            [newMeal.energy, 
+            newMeal.protein, 
+            newMeal.totalFat, 
+            newMeal.saturatedFat, 
+            newMeal.carbohydrates, 
+            newMeal.sugars, 
+            newMeal.sodium, 
+            newMeal.servingSize, 
+            newMeal.unitOfMeasurement,
+            foodId]);
+        return results;
+    }
+    catch(error){
+        throw new HttpError("Could not insert into servings table", 500);
+    }
+}
+
+export const createNewMeal = async(newMeal) => {
+    mysqlDb.connect();
+    try{
+        const foodTableResults = await createNewFood(newMeal.name);
+        if (foodTableResults.affectedRows < 1){
+            throw new HttpError("No record inserted into food table", 500);
+        }
+        const servingTableResults = await createNewServing(foodTableResults.insertId, newMeal);
+        if (servingTableResults.affectedRows < 1){
+            throw new HttpError("No record inserted into servings table", 500)
+        }
+    }
+    catch(error){
+        if (error.statusCode){
+            throw new HttpError(error.message, error.statusCode)
+        }
+        throw new HttpError("Something Went Wrong", 500)
+    }
+    finally{
+        mysqlDb.close()
     }
 }

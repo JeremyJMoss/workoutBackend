@@ -7,7 +7,7 @@ export const loginUser = (req, res, next) => {
     const {username, password} = req.body;
 
     retrieveUserToken(username, password)
-    .then(results => res.status(200).json(results))
+    .then(token => res.status(200).json(token))
     .catch(error => res.status(error.statusCode).send({message: error.message}))
 };
 
