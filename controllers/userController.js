@@ -1,6 +1,6 @@
 import { verifyUser } from "../services/databaseQuery.js";
 import { checkSignupData } from "../services/validate.js";
-import { authenticateUserToken, retrieveUserToken } from "../services/authentication.js";
+import { retrieveUserToken } from "../services/token.js";
 
 
 export const loginUser = (req, res, next) => {
@@ -20,13 +20,7 @@ export const signupUser = (req, res, next) => {
 }
 
 export const checkUserLoggedIn = (req, res, next) => {
-    const {token} = req.body;
-
-    const {decodedToken, isAuthenticated} = authenticateUserToken(token);
-
-    if(!isAuthenticated){
-        return res.status(401).send({message: "Unauthorized: Invalid or expired token"});
-    }
+    const decodedToken = req.token;
 
     verifyUser(decodedToken.id, decodedToken.username, decodedToken.email).then((user) => {
         if(user.length > 0){

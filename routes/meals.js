@@ -1,13 +1,15 @@
 // fired on meals routes
 
 import express from "express";
-import { createMeal, getMealList, getMealsBySearchQuery, getMealById } from "../controllers/mealController.js";
+import { createMeal, getMealList, getMealsBySearchQuery, getMealById, saveMeal } from "../controllers/mealController.js";
+import { adminAuth, userAuth } from "../middleware/Authorization.js";
 
 const router = express.Router();
 
-router.get("/meals/meallist", getMealList);
-router.post("/meals/filteredmeals", getMealsBySearchQuery);
-router.post("/admin/meals/createmeal", createMeal);
-router.post("/meals/getmealbyid", getMealById);
+router.get("/meals/meallist",  userAuth, getMealList);
+router.post("/meals/filteredmeals", userAuth, getMealsBySearchQuery);
+router.post("/meals/getmealbyid", userAuth, getMealById);
+router.post("/meals/savemeal", userAuth, saveMeal);
+router.post("/admin/meals/createmeal", adminAuth, createMeal);
 
 export default router;

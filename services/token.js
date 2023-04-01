@@ -3,29 +3,6 @@ import { JWT_SECRET_KEY } from "../config/config.js";
 import HttpError from "../models/HttpError.js";
 import { checkLoginCredentials, retrieveUserDetails } from "./databaseQuery.js";
 
-export const authenticateUserToken = (authToken) => {
-    
-    if (!authToken) return userAuthObject;
-
-    const userAuthObject = {isAdmin: false, isAuthenticated: false, decodedToken: null};
-
-    const decodedToken = jwt.verify(authToken, JWT_SECRET_KEY);
-
-    if(!decodedToken) return userAuthObject;
-
-    userAuthObject.decodedToken = decodedToken;
-
-    const expiry = new Date(decodedToken.exp)
-    const today = new Date();
-
-    if (today >= expiry) return userAuthObject;
-
-    userAuthObject.isAuthenticated = true;
-    userAuthObject.isAdmin = decodedToken.isAdmin;
-
-    return userAuthObject;
-}
-
 export const retrieveUserToken = async (username, password) => {
     if (!username) throw new HttpError("Username must not be empty", 400);
 

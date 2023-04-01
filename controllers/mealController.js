@@ -1,5 +1,4 @@
 import { createNewMeal, retrieveMealList, retrieveMealById, retrieveMealListBySearch } from "../services/databaseQuery.js";
-import { authenticateUserToken } from "../services/authentication.js";
 import { checkMealData } from "../services/validate.js";
 import { kilojoulesToCalories } from "../helper/helper.js";
 import Serving from "../models/Serving.js";
@@ -11,15 +10,8 @@ export const getMealList = (req, res, next) => {
 }
 
 export const getMealById = (req, res, next) => {
-    const authToken = req.headers.authorization?.split(" ")[1];
 
     const {id} = req.body;
-
-    const {isAuthenticated} = authenticateUserToken(authToken);
-
-    if(!isAuthenticated){
-        return res.status(401).send({message: "Unauthorized: Invalid or expired token"});
-    }
 
     retrieveMealById(id)
     .then(results => res.status(200).json({meal: results}))
@@ -29,15 +21,8 @@ export const getMealById = (req, res, next) => {
 }
 
 export const getMealsBySearchQuery = (req, res, next) => {
-    const authToken = req.headers.authorization?.split(" ")[1];
 
     const {searchQuery} = req.body;
-
-    const {isAuthenticated} = authenticateUserToken(authToken);
-
-    if (!isAuthenticated){
-        return res.status(401).send({message: "Unauthorized: Invalid or expired token"});
-    }
 
     if (typeof searchQuery !== "string"){
         return res.status(400).send({message: "Invalid Search Query"});
@@ -51,19 +36,8 @@ export const getMealsBySearchQuery = (req, res, next) => {
 }
 
 export const createMeal = (req, res, next) => {
-    const authToken = req.headers.authorization?.split(" ")[1];
-    
+
     const {meal} = req.body;
-
-    const {isAdmin, isAuthenticated} = authenticateUserToken(authToken);
-
-    if(!isAuthenticated){
-        return res.status(401).send({message: "Unauthorized: Invalid or expired token"})
-    }
-
-    if (!isAdmin){
-        return res.status(401).send({message: "Unauthorized: User does not have admin rights"})
-    }
 
     checkMealData(meal)
     .then(() => {
@@ -89,5 +63,9 @@ export const createMeal = (req, res, next) => {
         }
         return res.status(500).send({message: error.message});
     })
+
+}
+
+export const saveMeal = () => {
 
 }
