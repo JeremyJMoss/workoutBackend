@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { JWT_SECRET_KEY } from "../config/config.js";
 import HttpError from "../models/HttpError.js";
-import { checkLoginCredentials, retrieveUserDetails } from "./mySql.js";
+import { checkLoginCredentials, retrieveUserDetails } from "./databaseQuery.js";
 
 export const authenticateUserToken = (authToken) => {
     

@@ -1,4 +1,4 @@
-import { verifyUser } from "../services/mySql.js";
+import { verifyUser } from "../services/databaseQuery.js";
 import { checkSignupData } from "../services/validate.js";
 import { authenticateUserToken, retrieveUserToken } from "../services/authentication.js";
 

@@ -1,8 +1,9 @@
 class Serving {
 
+    //setting values per 1g or ml
     constructor(data){
         this.setName(data.name);
-        this.setServingSize(data.servingSize);
+        this.setRecommendedServingSize(data.servingSize);
         this.setUnitOfMeasurement(data.unitOfMeasurement);
         this.setEnergy(data.energy);
         this.setProtein(data.protein);
@@ -11,6 +12,10 @@ class Serving {
         this.setCarbohydrates(data.carbohydrates);
         this.setSugars(data.sugars);
         this.setSodium(data.sodium);
+    }
+
+    roundTo2Digits(number){
+        return Math.round((number + Number.EPSILON) * 100) / 100;    
     }
     
     /**
@@ -23,8 +28,8 @@ class Serving {
     /**
      * @param {number} servingSize
      */
-    setServingSize(servingSize){
-        this.servingSize = Number(servingSize);
+    setRecommendedServingSize(servingSize){
+        this.recommendedServingSize = Number(servingSize);
     }
 
     /**
@@ -38,7 +43,7 @@ class Serving {
      * @param {number} energy
      */
     setEnergy(energy){
-        this.energy = Number(energy);
+        this.energy = this.roundTo2Digits(Number(energy / this.recommendedServingSize));
     }
 
     /**
@@ -49,7 +54,7 @@ class Serving {
             this.protein = null;
         }
         else{
-            this.protein = Number(protein);
+            this.protein = this.roundTo2Digits(Number(protein / this.recommendedServingSize));
         }
     }
 
@@ -61,7 +66,7 @@ class Serving {
             this.totalFat = null;
         }
         else{
-            this.totalFat = Number(totalFat);
+            this.totalFat = this.roundTo2Digits(Number(totalFat / this.recommendedServingSize));
         }
     }
 
@@ -73,7 +78,7 @@ class Serving {
             this.saturatedFat = null;
         }
         else{
-            this.saturatedFat = Number(saturatedFat);
+            this.saturatedFat = this.roundTo2Digits(Number(saturatedFat / this.recommendedServingSize));
         }
     }
 
@@ -85,7 +90,7 @@ class Serving {
             this.carbohydrates = null;
         }
         else{
-            this.carbohydrates = Number(carbohydrates);
+            this.carbohydrates = this.roundTo2Digits(Number(carbohydrates / this.recommendedServingSize));
         }
     }
 
@@ -97,7 +102,7 @@ class Serving {
             this.sugars = null;
         }
         else{
-            this.sugars = Number(sugars);
+            this.sugars = this.roundTo2Digits(Number(sugars / this.recommendedServingSize));
         }
     }
 
@@ -109,7 +114,7 @@ class Serving {
             this.sodium = null;
         }
         else{
-            this.sodium = Number(sodium);
+            this.sodium = Math.floor(Number(sodium / this.recommendedServingSize));
         }
     }
 }

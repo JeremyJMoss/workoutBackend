@@ -5,7 +5,6 @@ import { comparePasswords } from "./cryptography.js";
 
 const mysqlDb = new MySQLDatabase(mySqlConfig);
 
-
 // User calls
 
 export const checkLoginCredentials = async (username, password) => {
@@ -88,9 +87,9 @@ export const createUser = async (user) => {
 
 // Meal Calls
 
-export const retrieveMealTypes = async () => {
+export const retrieveMealList = async () => {
     mysqlDb.connect();
-    const sqlQuery = "SELECT * FROM mealTypes;";
+    const sqlQuery = "SELECT * FROM food;";
     try {
         const results = await mysqlDb.query(sqlQuery);
         return results;
@@ -99,7 +98,61 @@ export const retrieveMealTypes = async () => {
         throw new Error(err.message);
     }
     finally{
+        mysqlDb.close()
+    }
+}
+
+export const retrieveMealListBySearch = async (searchQuery) => {
+    mysqlDb.connect();
+    searchQuery = searchQuery + "%";
+    const secondSearchCondition = "% " + searchQuery + "%"; 
+    const sqlQuery = "SELECT id, name FROM food WHERE UPPER(name) like UPPER(?) OR name like UPPER(?);";
+    try {
+        const results = await mysqlDb.query(sqlQuery, [searchQuery, secondSearchCondition]);
+        return results;
+    }
+    catch(error){
+        throw new Error(error.message);
+    }
+    finally{
         mysqlDb.close();
+    }
+}
+
+export const retrieveMealById = async (foodId) => {
+    mysqlDb.connect();
+    try{
+        const foodInfo = await retrieveFoodInfoById(foodId);
+        const servings = await retrieveServingsById(foodId);
+        return {...foodInfo[0], servings};
+    }
+    catch(error){
+        throw new HttpError(error.sqlMessage);
+    }
+    finally{
+        mysqlDb.close();
+    }
+}
+
+const retrieveFoodInfoById = async (foodId) => {
+    const sqlQuery = 'SELECT energy, protein, totalFat, saturatedFat, carbohydrates, sugars, sodium, unitOfMeasurement FROM foodInfo WHERE foodId = ?;';
+    try{
+        const results = await mysqlDb.query(sqlQuery, foodId);
+        return results;
+    }
+    catch(error){
+        throw new Error(error.message);
+    }
+}
+
+const retrieveServingsById = async (foodId) => {
+    const sqlQuery = "SELECT servingSize, name FROM servingSizes where foodId = ?;";
+    try{
+        const results = await mysqlDb.query(sqlQuery, foodId);
+        return results;
+    }
+    catch(error){
+        throw new Error(error.message);
     }
 }
 
@@ -114,9 +167,25 @@ const createNewFood = async(foodName) => {
     }
 }
 
-const createNewServing = async (foodId, newMeal) => {
-    const sqlQuery = "INSERT INTO servings (energy, protein, totalFat, saturatedFat, carbohydrates, sugars, sodium, servingSize, unitOfMeasurement, foodId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
-    console.log(newMeal);
+const createNewServing = async (foodId, name = "Single", servingSize = 1) => {
+    const sqlQuery = "INSERT INTO servingSizes (foodId, name, servingSize) VALUES (?, ?, ?);";
+    try{
+        const params = [foodId, name, servingSize];
+    
+        const results = await mysqlDb.query(
+            sqlQuery,
+            params
+        )
+        return results;
+    }
+    catch(error){
+        throw new HttpError("Could not insert into serving sizes table", 500);
+    }
+}
+
+// create an entry in the datatbase for either 1g or 1ml serving
+const createNewFoodInfoEntry = async (foodId, newMeal) => {
+    const sqlQuery = "INSERT INTO foodInfo (energy, protein, totalFat, saturatedFat, carbohydrates, sugars, sodium, unitOfMeasurement, foodId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"
     try{
         const results = await mysqlDb.query(
             sqlQuery, 
@@ -126,14 +195,13 @@ const createNewServing = async (foodId, newMeal) => {
             newMeal.saturatedFat, 
             newMeal.carbohydrates, 
             newMeal.sugars, 
-            newMeal.sodium, 
-            newMeal.servingSize, 
+            newMeal.sodium,
             newMeal.unitOfMeasurement,
             foodId]);
         return results;
     }
     catch(error){
-        throw new HttpError("Could not insert into servings table", 500);
+        throw new HttpError("Could not insert into food info table", 500);
     }
 }
 
@@ -144,9 +212,18 @@ export const createNewMeal = async(newMeal) => {
         if (foodTableResults.affectedRows < 1){
             throw new HttpError("No record inserted into food table", 500);
         }
-        const servingTableResults = await createNewServing(foodTableResults.insertId, newMeal);
-        if (servingTableResults.affectedRows < 1){
-            throw new HttpError("No record inserted into servings table", 500)
+        const foodId = foodTableResults.insertId
+        const servingsRecommendedResult = await createNewServing(foodId, "Serving", newMeal.recommendedServingSize);
+        if (servingsRecommendedResult.affectedRows < 1){
+            throw new HttpError("Serving record not inserted into serving sizes table");
+        }
+        const servingsSingleResult = await createNewServing(foodId);
+        if (servingsSingleResult.affectedRows < 1){
+            throw new HttpError("Single serving record not inserted into serving sizes table");
+        }
+        const foodInfoTableResults = await createNewFoodInfoEntry(foodId, newMeal);
+        if (foodInfoTableResults.affectedRows < 1){
+            throw new HttpError("No record inserted into food info table", 500);
         }
     }
     catch(error){
