@@ -9,18 +9,20 @@
  * @param {string} #lastName - the last name of the user.
  */
 class User{
-    #username
+    #username;
     #encryptedPassword;
     #email;
     #firstName;
     #lastName;
+    #isAdmin;
 
-    constructor(username, firstName, lastName, email, encryptedPassword){
+    constructor(username, firstName, lastName, email, encryptedPassword, isAdmin){
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.encryptedPassword = encryptedPassword;
+        this.isAdmin = isAdmin
     }
 
     /**
@@ -128,9 +130,28 @@ class User{
      */
     set encryptedPassword(encryptedPassword){
         if(!encryptedPassword){
-            throw new Error("password must not be empty");
+            throw new Error("Password must not be empty");
         }
         this.#encryptedPassword = encryptedPassword;
+    }
+
+        /**
+     * Getter to retrieve the #isAdmin field value.
+     * 
+     * @returns {boolean} - Whether user has admin rights.
+     */
+        get isAdmin(){
+            return this.#isAdmin;
+        }
+        
+    /**
+     * Setter to make sure isAdmin field is not empty or null.
+     * 
+     * @param {string} isAdmin - Whether user is admin or not.
+     * 
+     */
+    set isAdmin(isAdmin){
+        this.#isAdmin =  isAdmin ?? false;
     }
 }
 
