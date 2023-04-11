@@ -21,10 +21,11 @@ export const signupUser = (req, res, next) => {
 
 export const checkUserLoggedIn = (req, res, next) => {
     const decodedToken = req.token;
+    const authToken = req.headers.authorization?.split(" ")[1];
 
     verifyUser(decodedToken.id, decodedToken.username, decodedToken.email).then((user) => {
         if(user.length > 0){
-            return res.status(200).send({token})
+            return res.status(200).send({token: authToken});
         }
         return res.status(400).send({message: "Unauthorized: User not found"});
     })
