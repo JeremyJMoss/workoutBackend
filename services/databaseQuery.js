@@ -87,6 +87,21 @@ export const createUser = async (user) => {
 
 // Meal Calls
 
+export const checkServingExists = async (foodId, servingName) => {
+    mysqlDb.connect();
+    const sqlQuery = "SELECT * FROM servingSizes WHERE foodId = ? AND name = ?;";
+    try{
+        const results = await mysqlDb.query(sqlQuery, [foodId, servingName]);
+        return results;
+    }
+    catch(error){
+        throw new HttpError(error.message, 500);
+    }
+    finally{
+        mysqlDb.close();
+    }
+}
+
 export const retrieveMealList = async () => {
     mysqlDb.connect();
     const sqlQuery = "SELECT * FROM food;";
@@ -215,11 +230,11 @@ export const createNewMeal = async(newMeal) => {
         const foodId = foodTableResults.insertId
         const servingsRecommendedResult = await createNewServing(foodId, "Serving", newMeal.recommendedServingSize);
         if (servingsRecommendedResult.affectedRows < 1){
-            throw new HttpError("Serving record not inserted into serving sizes table");
+            throw new HttpError("Serving record not inserted into serving sizes table", 500);
         }
         const servingsSingleResult = await createNewServing(foodId);
         if (servingsSingleResult.affectedRows < 1){
-            throw new HttpError("Single serving record not inserted into serving sizes table");
+            throw new HttpError("Single serving record not inserted into serving sizes table", 500);
         }
         const foodInfoTableResults = await createNewFoodInfoEntry(foodId, newMeal);
         if (foodInfoTableResults.affectedRows < 1){
@@ -234,5 +249,29 @@ export const createNewMeal = async(newMeal) => {
     }
     finally{
         mysqlDb.close()
+    }
+}
+
+export const createNewMealEntry = async (mealEntry, userId) => {
+    mysqlDb.connect();
+    const sqlQuery = "INSERT INTO foodConsumed (userId, dateEaten, mealType, foodId, servingName, quantity) VALUES(?, ?, ?, ?, ?, ?);";
+    try{
+        const results = await mysqlDb.query(sqlQuery, [userId, mealEntry.dateEaten.split("T")[0], mealEntry.mealType, mealEntry.foodId, mealEntry.servingName, mealEntry.quantity]);
+        if (results.affectedRows < 1){
+            throw new HttpError("Meal entry record not inserted into table", 500);
+        }
+    }
+    catch(error){
+        console.log(error);
+        if (error.statusCode){
+            throw new HttpError(error.message, error.statusCode)
+        }
+        if (error.sqlMessage){
+            throw new HttpError(error.sqlMessage, 500);
+        }
+        throw new HttpError("Something Went Wrong", 500);
+    }
+    finally{
+        mysqlDb.close();
     }
 }

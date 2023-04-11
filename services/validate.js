@@ -1,8 +1,16 @@
 import { hashPassword } from "./cryptography.js";
 import User from "../models/User.js";
 import HttpError from "../models/HttpError.js";
-import { createUser } from "./databaseQuery.js";
+import { checkServingExists, createUser } from "./databaseQuery.js";
 import { validateDecimalNumber, validateEmail, validateEnergyUnit, validateFullName, validateServingSizeUnit, validateWholeNumber } from "../helper/helper.js";
+
+const mealTypes = [
+    "Breakfast", 
+    "Lunch", 
+    "Dinner", 
+    "Snacks", 
+    "Drinks"
+];
 
 export const checkSignupData = async (requestData) => {
     const {firstName, lastName, email, username, password} = requestData;
@@ -55,4 +63,18 @@ export const checkMealData = async (mealData) => {
     })
 
     return true;
+}
+
+export const checkMealEntry = async (mealEntry) => {
+    try{
+        if (!mealTypes.includes(mealEntry.mealType)) throw new HttpError("Invalid meal type", 400);
+        const results = await checkServingExists(mealEntry.foodId, mealEntry.servingName)
+        if (results.length < 1) throw new HttpError("Invalid food or serving", 400);
+    }
+    catch(error){
+        if (error.statusCode == 400){
+            throw new HttpError(error.message, 400);
+        }
+        throw new HttpError(error.message, 500);
+    }
 }

@@ -1,5 +1,5 @@
-import { createNewMeal, retrieveMealList, retrieveMealById, retrieveMealListBySearch } from "../services/databaseQuery.js";
-import { checkMealData } from "../services/validate.js";
+import { createNewMeal, retrieveMealList, retrieveMealById, retrieveMealListBySearch, createNewMealEntry } from "../services/databaseQuery.js";
+import { checkMealData, checkMealEntry } from "../services/validate.js";
 import { kilojoulesToCalories } from "../helper/helper.js";
 import Serving from "../models/Serving.js";
 
@@ -66,6 +66,28 @@ export const createMeal = (req, res, next) => {
 
 }
 
-export const saveMeal = () => {
+export const createMealEntry = (req, res, next) => {
+    
+    const decodedToken = req.token;
 
+    const userId = decodedToken.id;
+
+    const mealEntry = req.body;
+
+    checkMealEntry(mealEntry)
+    .then(() => {
+        createNewMealEntry(mealEntry, userId)
+        .then(() => {
+            return res.status(200).json(mealEntry);
+        })
+        .catch(error => {
+            if (error.statusCode){
+                return res.status(error.statusCode).send({message: error.message});
+            }
+            return res.status(500).send({message:error.message});
+        })
+    })
+    .catch(error => {
+        return res.status(error.statusCode).send({message: error.message});
+    })
 }
